@@ -823,7 +823,7 @@ void psort(Points &ps, Point c = O)              // 极角排序
 
 子集反演
 
-![image-20221022203726697](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022203726697.png)
+![1](picture/1.png)
 
 ```cpp
 #include<bits/stdc++.h>
@@ -938,9 +938,9 @@ for(int i=0;i<w;++i)//依次枚举每个维度{
 
 min25筛
 
-![image-20221022203814481](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022203814481.png)
+![image-20230417193124774](picture/image-20230417193124774.png)
 
-![image-20221022204204397](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022204204397.png)
+![image-20230417193136705](picture/image-20230417193136705.png)
 
 ```cpp
 #include<bits/stdc++.h>
@@ -1035,9 +1035,9 @@ signed main() {
 
 杜教筛
 
-![image-20221022210954323](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022210954323.png)
+![image-20230417193148305](picture/image-20230417193148305.png)
 
-![image-20221022204355946](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022204355946.png)
+![image-20230417193153080](picture/image-20230417193153080.png)
 
 ```cpp
 #include<bits/stdc++.h>
@@ -1126,7 +1126,7 @@ ll lucas(int n,int m,int p){
 
 卡特兰数
 
-![image-20221022205031202](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022205031202.png)
+![image-20230417193203934](picture/image-20230417193203934.png)
 
 
 
@@ -1139,30 +1139,30 @@ prufer序列
 1. prufer序列中，点u出现的次数，等于点u在树中的度数-1
 2. n个点的无根树，唯一对应长度为n-2的prufer序列，序列每个数都在1到n的范围内。
 3. Cayley定理：n个点的无向完全图的生成树的计数: $n^{n-2}$，即n个点的有标号无根树的计数
-4. n个节点的度依次为![d1,d2,\dots,dn](https://private.codecogs.com/gif.latex?d1%2Cd2%2C%5Cdots%2Cdn)的无根树共有![\frac{(n-2)!}{ \prod_{i=1}^n(d_i-1)!}](https://private.codecogs.com/gif.latex?%5Cfrac%7B%28n-2%29%21%7D%7B%20%5Cprod_%7Bi%3D1%7D%5En%28d_i-1%29%21%7D)个，因为此时Prufer编码中的数字i恰好出现di−1次，(n−2)!是总排列数
-5. n个点的有标号有根树的计数：![n^{n-2}*n=n^{n-1}](https://private.codecogs.com/gif.latex?n%5E%7Bn-2%7D*n%3Dn%5E%7Bn-1%7D)
+4. n个节点的度依次为![d1,d2,\dots,dn](picture/dots%2Cdn.gif)的无根树共有![\frac{(n-2)!}{ \prod_{i=1}^n(d_i-1)!}](picture/prod_{i%3D1}^n(d_i-1)!}-1681731226876-10.gif)个，因为此时Prufer编码中的数字i恰好出现di−1次，(n−2)!是总排列数
+5. n个点的有标号有根树的计数：![n^{n-2}*n=n^{n-1}](picture/gif.gif)
 
 
 
 矩阵树定理
 
-![image-20221022210346370](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022210346370.png)![image-20221022210551187](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022210551187.png)
+![image-20221022210551187](picture/image-20230417193208794.png)
 
-![image-20221022210531747](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022210531747.png)
+![image-20230417193212021](picture/image-20230417193212021.png)
 
 二项式反演（3个形式）
 
-![image-20221022210820269](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022210820269.png)
+![image-20230417193215913](picture/image-20230417193215913.png)
 
-![image-20221022210744570](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022210744570.png)
+![image-20230417193220041](picture/image-20230417193220041.png)
 
-![image-20221022210757796](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221022210757796.png)
+![image-20230417193223514](picture/image-20230417193223514.png)
 
 第一类斯特林数
 
 *n*个不同元素构成*m*个圆的排列方案数
 
-​		![image-20221118221002467](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221118221002467.png)
+​		![image-20230417193234830](picture/image-20230417193234830.png)
 
 第二类斯特林数
 
@@ -1170,25 +1170,25 @@ prufer序列
 
 ​																	$S(n,m)=S(n−1,m−1)+m\times S(n−1,m)$
 
-![img](http://latex.codecogs.com/gif.latex?\%20S(n,m)%20=%20\frac{1}{{{\rm{m}}!}}\sum\limits_{k%20=%200}^m%20{{{(%20-%201)}^k}C(m,k){{(m%20-%20k)}^n}}%20\)
+![image-20230417193242496](picture/image-20230417193242496.png)
 
 
 
-![img](https://img2020.cnblogs.com/blog/2194289/202010/2194289-20201027221734834-1951327531.png)
+![image-20230417193247475](picture/image-20230417193247475.png)
 
 下降幂
 
-![image-20221119130519936](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221119130519936.png)
+![image-20230417193251589](picture/image-20230417193251589.png)
 
 贝尔数
 
-![image-20221118220433573](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221118220433573.png)
+![image-20230417193253869](picture/image-20230417193253869.png)
 
-![image-20221115225457406](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221115225457406.png)
+![image-20230417193257221](picture/image-20230417193257221.png)
 
-![image-20221118220422719](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221118220422719.png)
+![image-20230417193301366](picture/image-20230417193301366.png)
 
-![image-20221118220727449](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20221118220727449.png)
+![image-20230417193304319](picture/image-20230417193304319.png)
 
 ```c++
 void init()
