@@ -1215,7 +1215,7 @@ int get_ans(int x)
 
 ```
 
-多项式全家桶 + bell数
+多项式全家桶+bell数
 
 ```c++
 #include <bits/stdc++.h>
