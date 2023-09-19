@@ -612,7 +612,117 @@ signed main(){
 }
 ```
 
+<div STYLE="page-break-after: always;"></div>
 
+Pollard rho
+
+```C++
+#include<bits/stdc++.h>
+#define int long long
+using namespace std;
+
+typedef __int128 i128;
+const int N = 1010;
+int n;
+int ans[N], tot;
+
+int randint(int l, int r) {
+	static mt19937 Rand(time(NULL));
+	uniform_int_distribution<int> dis(l, r);
+	return dis(Rand); 
+}
+
+int ksm(int a, int b, int p) {
+	int ret = 1;
+	while(b) {
+		if(b & 1) ret = (i128) ret * a % p;
+		a = (i128) a * a % p;
+		b >>= 1;
+	}
+	return ret;
+}
+
+bool miller_rabin(int n) {
+	if(n < 3 || n % 2 == 0) return n == 2;
+	int a = n - 1, b = 0;
+	while(a % 2 == 0) {
+		a /= 2;
+		b++;
+	}
+	for(int i = 1, j; i <= 10; ++i) {
+		int x = randint(2, n - 1);
+		int v = ksm(x, a, n);
+		if(v == 1) continue;
+		
+		for(j = 0; j < b; ++j) { //Ã»ÓÐint 
+			if(v == n - 1) break;
+			v = (i128)v * v % n;
+		}
+		if(j == b) return 0;
+	}
+	return 1;
+}
+
+int pollard_rho(int n) {
+	int s = 0, t = 0;
+	int c = randint(1, n - 1);
+	int step = 0, goal = 1;
+	int value = 1;
+	auto f = [&](int x) {
+		return ((i128)x*x+c)%n;
+	};
+	for(goal = 1; ; goal <<= 1, s = t, value = 1) {
+		for(step = 1; step <= goal; step++) {
+			t = f(t);
+			value = ((i128)value * abs(t - s)) % n;
+			if(step % 127 == 0) {
+				int d = __gcd(value, n);
+				if(d > 1) return d;
+			}
+		}
+		int d = __gcd(value, n);
+		if(d > 1) return d;
+	}
+	return 0;
+}
+
+void get_fac(int n) {
+	if(n == 1) return;
+	if(miller_rabin(n)) {
+		ans[++tot] = n;
+		return;
+	}
+	int p = n;
+	while(p == n) p = pollard_rho(n);
+	while((n % p) == 0) n /= p;
+	get_fac(n);
+	get_fac(p);
+}
+
+void solve() {
+	cin>>n;
+	tot = 0;
+	get_fac(n);
+	
+	sort(ans + 1, ans + 1 + tot);
+	tot = unique(ans + 1, ans + 1 + tot) - ans - 1;
+	if(ans[tot] == n) cout<<"Prime\n";
+	else cout<<ans[tot]<<"\n";
+}
+
+signed main() {
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+	
+	int t = 1;
+	cin>>t;
+	while(t--) {
+		solve();
+	}
+	
+	return 0;
+} 
+```
 
 <div STYLE="page-break-after: always;"></div>
 
@@ -1047,10 +1157,9 @@ void link(int x, int y) {
 	makeroot(x);
 	if(findroot(y) != x) {
 		t[x].fa = y;
+		access(y);
 	}
-	
 }
-
 void cut(int x, int y) {
 	if(findroot(x) != findroot(y)) return;
 	split(x, y);
@@ -1060,9 +1169,6 @@ void cut(int x, int y) {
 		update(y);
 	}
 }
-
-
-
 void solve() {
 	cin>>n>>m>>k;
 	
@@ -1138,6 +1244,177 @@ signed main() {
 
 <div STYLE="page-break-after: always;"></div>
 
+lct维护子树大小
+
+![image-20230919223905028](pictures/image-20230919223905028.png)
+
+```C++
+#include<bits/stdc++.h>
+#define lson t[x].son[0]
+#define rson t[x].son[1]
+#define int long long 
+using namespace std;
+
+const int N = 2e5 + 1010;
+const int inf = 1ll << 60;
+int n, q;
+int a[N];
+int stac[N];
+
+int mark[N];
+struct ED {
+	int u, v, l, r;
+}edge[N];
+
+struct node{
+	int son[2], fa;
+	int st;
+	int sz, sz2;
+	int flag;
+}t[N]; 
+
+void update(int x) {
+	t[x].sz = t[lson].sz + t[rson].sz + t[x].sz2 + 1;
+}
+
+void lazy(int x) {
+	swap(t[x].son[0], t[x].son[1]);
+	t[x].flag ^= 1;
+}
+
+void pushdown(int x) {
+	if(!t[x].flag) return;
+	lazy(t[x].son[0]);
+	lazy(t[x].son[1]);
+	t[x].flag = 0;
+}
+
+bool isroot(int x) {
+	return (t[t[x].fa].son[0] != x && t[t[x].fa].son[1] != x);
+}
+
+void rotate(int x){
+	int y = t[x].fa, z = t[y].fa;
+	int tag = (t[y].son[1] == x);
+	if(!isroot(y)) t[z].son[t[z].son[1]==y] = x;
+	t[x].fa = z;
+	t[y].son[tag] = t[x].son[tag^1];
+	t[t[x].son[tag^1]].fa = y;
+	t[x].son[tag^1] = y;
+	t[y].fa = x;
+	update(y);update(x);
+}
+
+void splay(int x) {
+	int ptr = 0, y = x;
+	stac[ptr++] = y;
+	while(!isroot(y)) {
+		stac[ptr++] = t[y].fa;
+		y = t[y].fa;
+	}
+	while(ptr--) pushdown(stac[ptr]);
+	while(!isroot(x)) {
+		int y = t[x].fa, z = t[y].fa;
+		if(!isroot(y)) {
+			(t[y].son[0] == x) ^ (t[z].son[0] == y) ? rotate(x) : rotate(y);
+		}
+		rotate(x);
+	}
+	update(x);
+}
+
+
+void access(int x) {
+	int tp = x, y = 0;
+	while(x) {
+		splay(x);
+		t[x].sz2 += t[rson].sz - t[y].sz;
+		t[x].son[1] = y;
+		update(x);
+		y = x;
+		x = t[x].fa;
+	}
+	splay(tp);
+}
+
+void makeroot(int x) {
+	access(x);
+	lazy(x);
+}
+
+int findroot(int x) {
+	access(x);
+	while(t[x].son[0]) {
+		pushdown(x);
+		x = t[x].son[0];
+	}
+	splay(x);
+	return x;
+}
+
+void split(int x, int y) {
+	makeroot(x);
+	access(y);
+}
+
+void link(int x, int y) {
+	makeroot(x);
+	if(findroot(y) != x) {
+		t[x].fa = y;
+		t[y].sz2 += t[x].sz;
+		//update(y);
+		access(y);
+	}
+	
+}
+
+void cut(int x, int y) {
+	if(findroot(x) != findroot(y)) return;
+	split(x, y);
+	if(t[y].son[0] == x && t[x].son[1] == 0) {
+		t[y].son[0] = 0;
+		t[x].fa = 0;
+		update(y);
+	}
+}
+
+void solve() {
+	cin>>n>>q;
+	for(int i = 1; i <= n; ++i) {
+		t[i].sz = 1;
+	}
+	for(int i = 1; i <= q; ++i) {
+		char op;
+		int x, y;
+		cin>>op>>x>>y;
+		if(op == 'A') {
+			link(x, y);
+		}
+		else {
+			split(x, y);
+			cout<<(t[x].sz2+1) * (t[y].sz2 + 1)<<"\n";
+		}
+
+	}
+	return;	
+}
+
+signed main() {
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+	
+	int t = 1;
+	//cin>>t;
+	while(t--) {
+		solve();
+	}
+		
+	return 0;
+}
+```
+
+<div STYLE="page-break-after: always;"></div>
+
 树上背包
 
 ```c++
@@ -1178,6 +1455,89 @@ int main() {
 		scanf("%d%d", &u, &m);
 		printf("%lld\n", f[u][m]);
 	}
+	return 0;
+}
+```
+
+<div STYLE="page-break-after: always;"></div>
+
+斯坦纳树
+
+![image-20230919224039062](pictures/image-20230919224039062.png)
+
+```C++
+#include<bits/stdc++.h>
+#define int long long
+using namespace std;
+const int N = 105;
+const int inf = 1ll << 60;
+int n, m, k;
+int po[N];
+vector<array<int, 2>> e[N];
+int dp[N][2020];
+int vis[N];
+
+priority_queue<pair<int, int>> q;
+
+void dij(int state) {
+	for(int i = 1; i <= n; ++i) vis[i] = 0;
+	while(!q.empty()) {
+		int x = q.top().second;
+		q.pop();
+		if(vis[x]) continue;
+		vis[x] = 1;
+		for(auto item : e[x]) {
+			int v = item[0], w = item[1];
+			if(dp[v][state] > dp[x][state] + w) {
+				dp[v][state] = dp[x][state] + w;
+				q.push({-dp[v][state], v});
+			}
+		}
+	}
+}
+
+void solve() {
+	cin>>n>>m>>k;
+	for(int i = 1, u, v, w; i <= m; ++i) {
+		cin>>u>>v>>w;
+		e[u].push_back({v, w});
+		e[v].push_back({u, w});
+	}
+	for(int i = 1; i <= n; ++i) {
+		for(int j = 0; j <= ((1ll << k) - 1); ++j) {
+			dp[i][j] = inf;
+		}
+	}
+	for(int i = 1; i <= k; ++i) {
+		cin>>po[i];
+		dp[po[i]][1ll << i-1] = 0;
+	}
+	for(int j = 0; j <= ((1ll << k) - 1); ++j) {
+		for(int i = 1; i <= n; ++i) {
+			for(int k = ( (j - 1) & j); k; k = (k - 1) & j) {
+				dp[i][j] = min(dp[i][j], dp[i][k] + dp[i][j ^ k]);
+			}
+			if(dp[i][j] != inf) q.push({-dp[i][j], i});
+		}
+		dij(j);
+	}
+	int ans = inf;
+	for(int i = 1; i <= n; ++i)  ans = min(ans, dp[i][((1ll << k) - 1)]);
+	cout<<ans;
+
+	
+}
+
+signed main() {
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+	int T = 1;
+	//cin>>T;
+	while(T--) {
+		solve();
+	}
+
+
 	return 0;
 }
 ```
@@ -1327,6 +1687,84 @@ for(int i=0;i<w;++i)//依次枚举每个维度{
     for(int j=0;j<(1<<w);++j)//求每个维度的前缀和{
         if(j&(1<<i))s[j]+=s[j^(1<<i)]; 
     }
+}
+```
+
+And卷积
+
+![image-20230904013453008](pictures/image-20230904013453008.png)
+
+```c++
+#include<bits/stdc++.h>
+using namespace std;
+const int N = 2e7+1010;
+const int inf = 1ll << 60;
+const int mod = 1e9 + 7;
+int n, m, k, cnt, len, p, q;
+int a[N], b[N];
+string s;
+long long f[N], g[N], F[N], G[N], H[N];
+unsigned int A,B,C;
+inline unsigned int rng61() {
+    A ^= A << 16;
+    A ^= A >> 5;
+    A ^= A << 1;
+    unsigned int t = A;
+    A = B;
+    B = C;
+    C ^= t ^ A;
+    return C;
+}
+
+void solve() {
+	
+	cin>>n>>A>>B>>C;
+    for (int i = 0; i < (1 << n); i++)
+        F[i] = f[i] = rng61() %mod;
+    for (int i = 0; i < (1 << n); i++)
+        G[i] = g[i] = rng61() % mod;
+    for(int i = 0; i < n; ++i) {
+    	for(int j = 0; j < (1ll << n); ++j) {
+    		if((j & (1ll << i)) == 0) {
+    			F[j] = F[j] + F[j + (1ll << i)];
+    			G[j] = G[j] + G[j + (1ll << i)];
+    		}
+    	}
+    }
+    for(int j = 0; j < (1ll << n); ++j) {
+    	F[j] %= mod;
+    	G[j] %= mod;
+		H[j] = F[j] * G[j] % mod;
+		//if(H[j]) cout<<j<<" "<<F[j]<<endl;
+	}
+	for(int i = 0; i < n; ++i) {
+    	//for(int j = (1ll << n) - 1; j >= 0; --j) {
+    	for(int j = 0; j < (1ll << n); ++j) {
+    		if((j & (1ll << i)) == 0) {
+    			H[j] -= H[j + (1ll << i)];
+    			H[j] %= mod;
+    			if(H[j] < 0) H[j] += mod;
+    		}
+    	}
+    }
+    long long ans = 0;
+    for(int j = 0; j < (1ll << n); ++j) {
+    	ans ^= H[j];
+    }
+    cout<<ans;
+}
+
+signed main() {
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+	int T = 1;
+	//cin>>T;
+	while(T--) {
+		solve();
+	}
+
+
+	return 0;
 }
 ```
 
@@ -1740,6 +2178,10 @@ signed main() {
 }
 ```
 
+![image-20230912211947844](pictures/image-20230912211947844.png)
+
+![image-20230912212118518](pictures/image-20230912212118518.png)
+
 <div STYLE="page-break-after: always;"></div>
 
 卢卡斯定理
@@ -1857,6 +2299,109 @@ int main(){
 }
 ```
 
+第一类斯特林数-行
+
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+#define int long long 
+typedef long long ll;
+const ll mod=167772161;
+ll G=3,invG;
+const int N=1200000;
+ll ksm(ll b,int n){
+	ll res=1;
+	while(n){
+		if(n&1) res=res*b%mod;
+		b=b*b%mod; n>>=1;
+	}
+	return res;
+}
+int read(){
+	int x=0;char ch=getchar();
+	while(!isdigit(ch))ch=getchar();
+	while(isdigit(ch)) x=(x*10+(ch-'0'))%mod,ch=getchar();
+	return x;
+}
+int tr[N];
+void NTT(ll *f,int n,int fl){
+	for(int i=0;i<n;++i)
+		if(i<tr[i]) swap(f[i],f[tr[i]]);
+	for(int p=2;p<=n;p<<=1){
+		int len=(p>>1);
+		ll w=ksm((fl==0)?G:invG,(mod-1)/p);
+		for(int st=0;st<n;st+=p){
+			ll buf=1,tmp;
+			for(int i=st;i<st+len;++i)
+				tmp=buf*f[i+len]%mod,
+				f[i+len]=(f[i]-tmp+mod)%mod,
+				f[i]=(f[i]+tmp)%mod,
+				buf=buf*w%mod;
+		}
+	}
+	if(fl==1){
+		ll invN=ksm(n,mod-2);
+		for(int i=0;i<n;++i)
+			f[i]=(f[i]*invN)%mod;
+	}
+}
+void Mul(ll *f,ll *g,int n,int m){
+	m+=n;n=1;
+	while(n<m) n<<=1;
+	for(int i=0;i<n;++i)
+		tr[i]=(tr[i>>1]>>1)|((i&1)?(n>>1):0);
+	NTT(f,n,0);
+	NTT(g,n,0);
+	for(int i=0;i<n;++i) f[i]=f[i]*g[i]%mod;
+	NTT(f,n,1);
+}
+ll inv[N],fac[N];
+ll w[N],a[N],b[N],g[N];
+void Solve(ll *f,int m){
+	if(m==1) return f[1]=1,void(0);
+	if(m&1){
+		Solve(f,m-1);
+		for(int i=m;i>=1;--i)
+			f[i]=(f[i-1]+f[i]*(m-1)%mod)%mod;
+		f[0]=f[0]*(m-1)%mod;
+	}
+	else{
+		int n=m/2;ll res=1;
+		Solve(f,n);
+		for(int i=0;i<=n;++i)
+			a[i]=f[i]*fac[i]%mod,b[i]=res*inv[i]%mod,res=res*n%mod;
+		reverse(a,a+n+1);
+		Mul(a,b,n+1,n+1);
+		for(int i=0;i<=n;++i)
+			g[i]=inv[i]*a[n-i]%mod;
+		Mul(f,g,n+1,n+1);
+		int limit=1;
+		while(limit<(n+1)<<1) limit<<=1;
+		for(int i=n+1;i<limit;++i) a[i]=b[i]=g[i]=0;
+		for(int i=m+1;i<limit;++i) f[i]=0;
+	}
+}
+ll f[N];
+void init(int n){
+	fac[0]=1;
+	for(int i=1;i<=n;++i)
+		fac[i]=1ll*fac[i-1]*i%mod;
+	inv[n]=ksm(fac[n],mod-2);
+	for(int i=n-1;i>=0;--i)
+		inv[i]=1ll*inv[i+1]*(i+1)%mod;
+}
+signed main(){
+	invG=ksm(G,mod-2);
+	int n,k=0;
+	cin>>n;
+	init(n+n);
+	Solve(f,n);
+	for(int i=0;i<=n;++i)
+		printf("%lld ",f[i]);
+	return 0;
+}
+```
+
 卡特兰数
 
 ![image-20230417193203934](picture/image-20230417193203934.png)
@@ -1897,6 +2442,10 @@ prufer序列
 
 ​		![image-20230417193234830](picture/image-20230417193234830.png)
 
+第一类斯特林数列
+
+![image-20230917002728588](pictures/image-20230917002728588.png)
+
 第二类斯特林数
 
 *n*个不同元素构成*m*个集合的排列方案数
@@ -1909,11 +2458,19 @@ prufer序列
 
 ![image-20230417193247475](picture/image-20230417193247475.png)
 
+第二类斯特林数列
+
+![image-20230917002917325](pictures/image-20230917002917325.png)
+
+![image-20230917003413491](pictures/image-20230917003413491.png)
+
 下降幂
 
 ![image-20230417193251589](picture/image-20230417193251589.png)
 
 贝尔数
+
+$exp(e^x - 1)$
 
 ![image-20230417193253869](picture/image-20230417193253869.png)
 
@@ -1922,6 +2479,12 @@ prufer序列
 ![image-20230417193301366](picture/image-20230417193301366.png)
 
 ![image-20230417193304319](picture/image-20230417193304319.png)
+
+
+
+![image-20230917003103022](pictures/image-20230917003103022.png)
+
+![image-20230917003045607](pictures/image-20230917003045607.png)
 
 ```c++
 void init()
