@@ -18,8 +18,18 @@
 
 
 
-​																	Template For ICPC
-​																										——lovekdl
+​												Template For ICPC
+​																								——lovekdl
+
+
+
+
+
+
+
+
+
+
 
 <div STYLE="page-break-after: always;"></div>
 
@@ -411,6 +421,10 @@ signed main() {
 <div STYLE="page-break-after: always;"></div>
 
 拉格朗日插值
+
+<img src="pictures/image-20231013143341008.png" alt="image-20231013143341008" style="zoom:80%;" />
+
+<img src="pictures/image-20231013155727605.png" alt="image-20231013155727605" style="zoom:80%;" />
 
 ```c++
 #include<bits/stdc++.h>
@@ -1463,7 +1477,11 @@ int main() {
 
 斯坦纳树
 
+n=100 m=500 k=10
+
 ![image-20230919224039062](pictures/image-20230919224039062.png)
+
+![image-20231013113013258](pictures/image-20231013113013258.png)
 
 ```C++
 #include<bits/stdc++.h>
@@ -2104,6 +2122,8 @@ signed main() {
 
 ![image-20230417193153080](picture/image-20230417193153080.png)
 
+![image-20231013114525875](pictures/image-20231013114525875.png)
+
 ```cpp
 #include<bits/stdc++.h>
 #define int long long
@@ -2180,7 +2200,62 @@ signed main() {
 
 ![image-20230912211947844](pictures/image-20230912211947844.png)
 
-![image-20230912212118518](pictures/image-20230912212118518.png)
+<div STYLE="page-break-after: always;"></div>
+
+FWT
+
+```cpp
+const int N = 1 << 17 | 1;
+int n, m;
+modint A[N], B[N], a[N], b[N];
+
+inline void in() {
+	for (int i = 0; i < n; i++) a[i] = A[i], b[i] = B[i];
+}
+
+inline void get() {
+	for (int i = 0; i < n; i++) a[i] *= b[i];
+}
+
+inline void out() {
+	for (int i = 0; i < n; i++) print(a[i], " \n"[i==n-1]);
+}
+
+inline void OR(modint *f, modint x = 1) {
+	for (int o = 2, k = 1; o <= n; o <<= 1, k <<= 1)
+		for (int i = 0; i < n; i += o)
+			for (int j = 0; j < k; j++)
+				f[i+j+k] += f[i+j] * x;
+}
+
+inline void AND(modint *f, modint x = 1) {
+	for (int o = 2, k = 1; o <= n; o <<= 1, k <<= 1)
+		for (int i = 0; i < n; i += o)
+			for (int j = 0; j < k; j++)
+				f[i+j] += f[i+j+k] * x;
+}
+
+inline void XOR(modint *f, modint x = 1) {
+	for (int o = 2, k = 1; o <= n; o <<= 1, k <<= 1)
+		for (int i = 0; i < n; i += o)
+			for (int j = 0; j < k; j++)
+				f[i+j] += f[i+j+k],
+				f[i+j+k] = f[i+j] - f[i+j+k] - f[i+j+k],
+				f[i+j] *= x, f[i+j+k] *= x;
+}
+
+int main() {
+	rd(m), n = 1 << m;
+	for (int i = 0; i < n; i++) rd(A[i]);
+	for (int i = 0; i < n; i++) rd(B[i]);
+	in(), OR(a), OR(b), get(), OR(a, P - 1), out();
+	in(), AND(a), AND(b), get(), AND(a, P - 1), out();
+	in(), XOR(a), XOR(b), get(), XOR(a, (modint)1 / 2), out();
+	return 0;
+}
+```
+
+
 
 <div STYLE="page-break-after: always;"></div>
 
