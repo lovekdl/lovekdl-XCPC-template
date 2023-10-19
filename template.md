@@ -18,8 +18,8 @@
 
 
 
-​												Template For ICPC
-​																								——lovekdl
+​								Template For ICPC
+​																	——lovekdl
 
 
 
@@ -35,7 +35,11 @@
 
 
 
-FFT
+[TOC]
+
+
+
+### FFT
 
 ```c++
 #include<bits/stdc++.h>
@@ -111,9 +115,7 @@ int main(){
 
 <div STYLE="page-break-after: always;"></div>
 
-
-
-多项式
+### 多项式
 
 ```C++
 #include<bits/stdc++.h>
@@ -281,51 +283,6 @@ void sqrt(int *F, int *G, int n){
 
 void solve() {
 
-	// int x, y;
-	// cin>>x>>y;
-	// for(int i = 0; i <= x; ++i) {
-	// 	cin>>a[i];
-	// }
-	// for(int i = 0; i <= y; ++i) {
-	// 	cin>>b[i];
-	// }
-	// mul(a, x, b, y);
-	// for(int i = 0; i <= x + y; ++i) {
-	// 	cout<<a[i]<<" ";
-	// }
-
-	// int n;
-	// cin>>n;
-	// for(int i = 0 ; i < n; ++i) {
-	// 	cin>>a[i];
-	// }
-	// inv(a, b, n);
-	// for(int i = 0; i < n; ++i) {
-	// 	cout<<b[i]<<" ";
-	// }
-
-
-	
-	// int n;
-	// cin>>n;
-	// for(int i = 0; i < n; ++i) {
-	// 	cin>>a[i];
-	// }
-	// ln(a, b, n);
-	// for(int i =0; i < n; ++i) {
-	// 	cout<<b[i]<<" ";
-	// }
-
-	// int n;
-	// cin>>n;
-	// for(int i = 0; i < n; ++i) {
-	// 	cin>>a[i];
-	// }
-	// exp(a, b, n);
-	// for(int i = 0; i < n; ++i) {
-	// 	cout<<b[i]<<" ";
-	// }
-
 	int n;
 	cin>>n;
 	for(int i = 0; i < n; ++i) {
@@ -351,7 +308,7 @@ signed main() {
 
 <div STYLE="page-break-after: always;"></div>
 
-分治NTT
+### 分治NTT
 
 ```c++
 /*
@@ -420,7 +377,95 @@ signed main() {
 
 <div STYLE="page-break-after: always;"></div>
 
-拉格朗日插值
+### 类欧几里得
+
+![img](pictures/20190726171913552.png)
+
+![img](pictures/70.png)
+
+```c++
+LL S(LL k)
+{   
+    return (k*(k+1)/2ll)%MOD;
+}
+LL f(LL a,LL b,LL c,LL n)
+{
+    if(!a)return (n+1)*(b/c)%MOD;
+    if(a>=c || b>=c)
+      return ((a/c)*S(n)%MOD+(n+1)*(b/c)%MOD+f(a%c,b%c,c,n))%MOD;
+    LL m=(a*n+b)/c;
+    return (m*n%MOD-f(c,c-b-1,a,m-1)+MOD)%MOD;
+}
+```
+
+```c++
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <cmath>
+ 
+using namespace std;
+ 
+const int mo=1e9+7,inv2=500000004,inv6=166666668;
+ 
+typedef long long LL;
+ 
+int a,b,c,l,r;
+ 
+struct data
+{
+    int f,g,h;
+};
+ 
+data calc(int a,int b,int c,LL n)
+{
+    data tmp;
+    if (!a)
+    {
+        tmp.f=tmp.g=tmp.h=0;
+        return tmp;
+    }
+    if (a>=c || b>=c)
+    {
+        tmp=calc(a%c,b%c,c,n);
+        n%=mo;
+        tmp.h=(tmp.h+
+                n*(n+1)%mo*(2*n+1)%mo*inv6%mo*(a/c)%mo*(a/c)%mo
+                  +(n+1)*(b/c)%mo*(b/c)%mo
+                    +(LL)2*(a/c)*tmp.g%mo
+                      +(LL)2*(b/c)*tmp.f%mo
+                        +n*(n+1)%mo*(a/c)%mo*(b/c))%mo;
+        tmp.f=(tmp.f
+                +n*(n+1)/2%mo*(a/c)
+                    +(n+1)*(b/c))%mo;
+        tmp.g=(tmp.g
+                +n*(n+1)%mo*(2*n+1)%mo*inv6%mo*(a/c)
+                    +n*(n+1)/2%mo*(b/c))%mo;
+        return tmp;
+    }
+    LL m=((LL)a*n+b)/c;
+    data nxt=calc(c,c-b-1,a,m-1);
+    n%=mo; m%=mo;
+    tmp.f=((n*m-nxt.f)%mo+mo)%mo;
+    tmp.g=(LL)((n*(n+1)%mo*m-nxt.f-nxt.h)%mo+mo)*inv2%mo;
+    tmp.h=((m*(m+1)%mo*n-(LL)2*(nxt.g+nxt.f)%mo-tmp.f)%mo+mo)%mo;
+    return tmp;
+}
+ 
+int main()
+{
+    freopen("task.in","r",stdin); freopen("task.out","w",stdout);
+    scanf("%d%d%d%d%d",&a,&c,&b,&l,&r);
+    printf("%d\n",(calc(a,b,c,r).g-calc(a,b,c,l-1).g+mo)%mo);
+    return 0;
+}
+```
+
+
+
+<div STYLE="page-break-after: always;"></div>
+
+### 拉格朗日插值
 
 <img src="pictures/image-20231013143341008.png" alt="image-20231013143341008" style="zoom:80%;" />
 
@@ -435,17 +480,7 @@ const int mod = 998244353;
 int T;
 int n, k;
 int x[N], y[N];
-
-int qpow(int a, int b) {
-	int ret = 1;
-	while(b) {
-		if(b & 1) ret = ret * a % mod;
-		a = a * a % mod;
-		b >>= 1;
-	}
-	return ret;
-}
-
+int qpow(int a, int b) {//...}
 int lagrange(int k) {
 	int ans = 0;
 	for(int i = 1; i <= n; ++i) {
@@ -463,7 +498,7 @@ int lagrange(int k) {
 
 <div STYLE="page-break-after: always;"></div>
 
-exgcd
+### exgcd
 
 ```c++
 int exgcd(int a, int b, int &x, int &y) {
@@ -478,7 +513,7 @@ int exgcd(int a, int b, int &x, int &y) {
 }
 ```
 
-合并两个同余方程(CRT)
+### 合并两个同余方程(CRT)
 
 ```c++
 //x = a mod b
@@ -501,7 +536,48 @@ void merge(ll &a, ll &b, ll c, ll d) {
 
 <div STYLE="page-break-after: always;"></div>
 
-莫比乌斯反演
+### BSGS
+
+```c++
+//ad * a^x = b(mod p)  return x(-1 is no solution)
+int bsgs(int a, int b, int p, int ad = 1) {
+	int m = sqrt(p) + 1;
+	unordered_map<int, int> mp;
+	int s = 1;
+	for(int i = 0; i < m; ++i, s = s * a % p) {
+		int x = s * b % p;
+		mp[x] = i;
+
+	}
+	int ans = inf;
+	for(int i = 0, tmp = s, s = ad; i <= m; ++i, s = s * tmp % p) {
+		if(mp.count(s)) {
+			if(i*m - mp[s] >= 0) return i*m - mp[s];
+		}
+	}
+	return -1;
+}
+int exbsgs(int a, int b, int p) {
+	a %= p;
+	b %= p;
+	if(b == 1 || p == 1) return 0;
+	int cnt = 0, d = 0, ad = 1;
+	while((d = __gcd(a, p))^1) {
+		if(b%d) return -1;
+		cnt++; b/=d;p/=d;
+		ad = a/d *ad % p;
+		if(ad == b) {return cnt;}
+	}
+	int ans = bsgs(a,b,p,ad);
+	if(ans == -1) return -1;
+	return ans + cnt;
+}
+```
+
+<div STYLE="page-break-after: always;"></div>
+
+### 莫比乌斯反演
+
 $$
 f[n] = {∑_{d|n}}g(d) 求g(n)
 $$
@@ -554,7 +630,7 @@ int main() {
 
 <div STYLE="page-break-after: always;"></div>
 
-求积性函数
+### 求积性函数
 
 ```c++
 void compute(function<void(int)> calc) {
@@ -592,7 +668,7 @@ void solve() {
 
 <div STYLE="page-break-after: always;"></div>
 
-O($\sqrt{n}$)求$\sum_{i=1}^n{gcd(i,n)}$
+### O($\sqrt{n}$)求$\sum_{i=1}^n{gcd(i,n)}$
 积性函数，$g(p^a) = (a+1)p^a - ap^{a-1}$
 
 ```c++
@@ -628,7 +704,7 @@ signed main(){
 
 <div STYLE="page-break-after: always;"></div>
 
-Pollard rho
+### Pollard rho
 
 ```C++
 #include<bits/stdc++.h>
@@ -740,81 +816,7 @@ signed main() {
 
 <div STYLE="page-break-after: always;"></div>
 
-tarjan缩点
-
-```c++
-#include<bits/stdc++.h>
-#define int long long 
-using namespace std;
-const int maxn = 1e5+100;
-int n, m;
-int num, ans;
-int w[maxn];
-int dfn[maxn], low[maxn], vis[maxn];
-int belong[maxn], in[maxn], f[maxn];
-struct Edge {
-	int next[maxn], to[maxn], from[maxn];
-	int head[maxn], cnt;
-	void con(int u, int v) {
-		next[++cnt] = head[u];
-		to[cnt] = v;
-		from[cnt] = u;
-		head[u] = cnt;
-	}
-}ED1, ED2;
-stack <int> stu;
-void tarjan(int x) {
-	low[x] = dfn[x] = ++num;
-	vis[x] = 1;
-	stu.push(x);
-	for(int i = ED1.head[x]; i; i = ED1.next[i]) {
-		int v = ED1.to[i];
-		if(!dfn[v]) {
-			tarjan(v);
-			low[x] = min(low[x], low[v]);
-		}
-		if(vis[v])
-			low[x] = min(low[x], low[v]);
-	}
-	if(dfn[x] == low[x]) {
-		while(stu.top() != x) {
-			int y = stu.top();
-			stu.pop();
-			belong[y] = x;
-			w[x] += w[y];
-			vis[y] = 0;
-		}
-		belong[x] = x;
-		vis[x] = 0;
-		stu.pop();
-	}
-}
-signed main() {
-	cin>>n>>m;
-	for(int i = 1; i <= n; ++i)
-		scanf("%lld", &w[i]);
-	for(int i = 1; i <= m; ++i) {
-		int u, v;
-		scanf("%lld%lld", &u, &v);
-		ED1.con(u, v);
-	}
-	for(int i = 1; i <= n; ++i) {
-		if(!dfn[i]) tarjan(i);
-	}
-	for(int i = 1; i <= m; ++i) {
-		int u = belong[ED1.from[i]], v = belong[ED1.to[i]];
-		if(u == v) continue;
-		++in[v];
-		ED2.con(u, v);
-	}
-    //topo
-	return 0;
-}
-```
-
-<div STYLE="page-break-after: always;"></div>
-
-线性基
+### 线性基
 
 ```c++
 #include<bits/stdc++.h>
@@ -910,11 +912,9 @@ signed main() {
 }
 ```
 
-
-
 <div STYLE="page-break-after: always;"></div>
 
-虚树
+### 虚树
 
 ```c++
 #include<bits/stdc++.h>
@@ -1044,7 +1044,7 @@ signed main() {
 
 <div STYLE="page-break-after: always;"></div>
 
-LCT维护最大生成树(边的消失时间)
+### LCT维护最大生成树(边的消失时间)
 
 ![image-20230819001635736](pictures/image-20230819001635736.png)
 
@@ -1241,7 +1241,6 @@ void solve() {
 	}
 	return;	
 }
-
 signed main() {
 	ios::sync_with_stdio(false);
 	cin.tie(nullptr);
@@ -1251,14 +1250,15 @@ signed main() {
 	while(t--) {
 		solve();
 	}
-		
 	return 0;
 }
 ```
 
 <div STYLE="page-break-after: always;"></div>
 
-lct维护子树大小
+
+
+### lct维护子树大小
 
 ![image-20230919223905028](pictures/image-20230919223905028.png)
 
@@ -1429,7 +1429,7 @@ signed main() {
 
 <div STYLE="page-break-after: always;"></div>
 
-树上背包
+### 树上背包
 
 ```c++
 #include<bits/stdc++.h>
@@ -1475,11 +1475,11 @@ int main() {
 
 <div STYLE="page-break-after: always;"></div>
 
-斯坦纳树
+### 斯坦纳树
 
 n=100 m=500 k=10
 
-![image-20230919224039062](pictures/image-20230919224039062.png)
+<img src="pictures/image-20230919224039062.png" alt="image-20230919224039062" style="zoom:80%;" />
 
 ![image-20231013113013258](pictures/image-20231013113013258.png)
 
@@ -1494,9 +1494,7 @@ int po[N];
 vector<array<int, 2>> e[N];
 int dp[N][2020];
 int vis[N];
-
 priority_queue<pair<int, int>> q;
-
 void dij(int state) {
 	for(int i = 1; i <= n; ++i) vis[i] = 0;
 	while(!q.empty()) {
@@ -1513,7 +1511,6 @@ void dij(int state) {
 		}
 	}
 }
-
 void solve() {
 	cin>>n>>m>>k;
 	for(int i = 1, u, v, w; i <= m; ++i) {
@@ -1542,10 +1539,7 @@ void solve() {
 	int ans = inf;
 	for(int i = 1; i <= n; ++i)  ans = min(ans, dp[i][((1ll << k) - 1)]);
 	cout<<ans;
-
-	
 }
-
 signed main() {
 	ios::sync_with_stdio(false);
 	cin.tie(nullptr);
@@ -1562,7 +1556,7 @@ signed main() {
 
 <div STYLE="page-break-after: always;"></div>
 
-区间合并、区间求交
+### 区间合并、区间求交
 
 ```c++
 void merge(vector<PII> &segs) {
@@ -1597,7 +1591,7 @@ vector<PII> intersection(vector<PII> a, vector<PII> b) {
 
 <div STYLE="page-break-after: always;"></div>
 
-子集反演
+### 子集反演
 
 ![1](picture/1.png)
 
@@ -1617,14 +1611,12 @@ void clear() {
 	for(int i = 1; i <= n + 1; ++i) 
 		for(int j = 1; j <= n + 1; ++j) a[i][j] = 0;
 }
-
 void con(int u, int v) {
 	a[u][u]++;
 	a[v][v]++;
 	a[u][v]--;
 	a[v][u]--;
 }
-
 void add() {
 	for(int i = 1; i <= cnt; ++i) {
 		for(auto x : road[po[i]]) {
@@ -1632,7 +1624,6 @@ void add() {
 		}
 	}
 }
-
 int work() {
 	int w = n;
 	int ret = 1;/*
@@ -1696,9 +1687,7 @@ signed main() {
 }
 ```
 
-
-
-子集dp
+### 子集dp
 
 ```c++
 for(int i=0;i<w;++i)//依次枚举每个维度{
@@ -1708,7 +1697,7 @@ for(int i=0;i<w;++i)//依次枚举每个维度{
 }
 ```
 
-And卷积
+### And卷积
 
 ![image-20230904013453008](pictures/image-20230904013453008.png)
 
@@ -1786,11 +1775,9 @@ signed main() {
 }
 ```
 
-
-
 <div STYLE="page-break-after: always;"></div>
 
-矩形面积并
+### 矩形面积并
 
 ```C++
 #include<bits/stdc++.h>
@@ -1908,7 +1895,7 @@ signed main() {
 
 <div STYLE="page-break-after: always;"></div>
 
-李超线段树
+### 李超线段树
 
 ```c++
 #include<bits/stdc++.h>
@@ -2017,7 +2004,7 @@ signed main() {
 }
 ```
 
-min25筛
+### min25筛
 
 ![image-20230417193124774](picture/image-20230417193124774.png)
 
@@ -2116,7 +2103,7 @@ signed main() {
 
 <div STYLE="page-break-after: always;"></div>
 
-杜教筛
+### 杜教筛
 
 ![image-20230417193148305](picture/image-20230417193148305.png)
 
@@ -2202,7 +2189,7 @@ signed main() {
 
 <div STYLE="page-break-after: always;"></div>
 
-FWT
+### FWT
 
 ```cpp
 const int N = 1 << 17 | 1;
@@ -2227,14 +2214,12 @@ inline void OR(modint *f, modint x = 1) {
 			for (int j = 0; j < k; j++)
 				f[i+j+k] += f[i+j] * x;
 }
-
 inline void AND(modint *f, modint x = 1) {
 	for (int o = 2, k = 1; o <= n; o <<= 1, k <<= 1)
 		for (int i = 0; i < n; i += o)
 			for (int j = 0; j < k; j++)
 				f[i+j] += f[i+j+k] * x;
 }
-
 inline void XOR(modint *f, modint x = 1) {
 	for (int o = 2, k = 1; o <= n; o <<= 1, k <<= 1)
 		for (int i = 0; i < n; i += o)
@@ -2243,7 +2228,6 @@ inline void XOR(modint *f, modint x = 1) {
 				f[i+j+k] = f[i+j] - f[i+j+k] - f[i+j+k],
 				f[i+j] *= x, f[i+j+k] *= x;
 }
-
 int main() {
 	rd(m), n = 1 << m;
 	for (int i = 0; i < n; i++) rd(A[i]);
@@ -2255,11 +2239,9 @@ int main() {
 }
 ```
 
-
-
 <div STYLE="page-break-after: always;"></div>
 
-卢卡斯定理
+### 卢卡斯定理
 
 ```cpp
 ll lucas(int n,int m,int p){
@@ -2268,7 +2250,7 @@ ll lucas(int n,int m,int p){
 }
 ```
 
-扩展卢卡斯定理
+### 扩展卢卡斯定理
 
 ```C++
 #include<bits/stdc++.h>
@@ -2374,7 +2356,7 @@ int main(){
 }
 ```
 
-第一类斯特林数-行
+### 第一类斯特林数-行
 
 ```cpp
 #include<bits/stdc++.h>
@@ -2477,13 +2459,13 @@ signed main(){
 }
 ```
 
-卡特兰数
+### 卡特兰数
 
 ![image-20230417193203934](picture/image-20230417193203934.png)
 
 
 
-prufer序列
+### prufer序列
 
 一个长度为n-2的Prufer序列，唯一对应一棵n个点固定形态的无根树。
 
@@ -2497,13 +2479,13 @@ prufer序列
 
 
 
-矩阵树定理
+### 矩阵树定理
 
 ![image-20221022210551187](picture/image-20230417193208794.png)
 
 ![image-20230417193212021](picture/image-20230417193212021.png)
 
-二项式反演（3个形式）
+### 二项式反演（3个形式）
 
 ![image-20230417193215913](picture/image-20230417193215913.png)
 
@@ -2511,17 +2493,17 @@ prufer序列
 
 ![image-20230417193223514](picture/image-20230417193223514.png)
 
-第一类斯特林数
+### 第一类斯特林数
 
 *n*个不同元素构成*m*个圆的排列方案数
 
 ​		![image-20230417193234830](picture/image-20230417193234830.png)
 
-第一类斯特林数列
+### 第一类斯特林数列
 
 ![image-20230917002728588](pictures/image-20230917002728588.png)
 
-第二类斯特林数
+### 第二类斯特林数
 
 *n*个不同元素构成*m*个集合的排列方案数
 
@@ -2533,17 +2515,17 @@ prufer序列
 
 ![image-20230417193247475](picture/image-20230417193247475.png)
 
-第二类斯特林数列
+### 第二类斯特林数列
 
 ![image-20230917002917325](pictures/image-20230917002917325.png)
 
 ![image-20230917003413491](pictures/image-20230917003413491.png)
 
-下降幂
+### 下降幂
 
 ![image-20230417193251589](picture/image-20230417193251589.png)
 
-贝尔数
+### 贝尔数
 
 $exp(e^x - 1)$
 
@@ -2554,12 +2536,6 @@ $exp(e^x - 1)$
 ![image-20230417193301366](picture/image-20230417193301366.png)
 
 ![image-20230417193304319](picture/image-20230417193304319.png)
-
-
-
-![image-20230917003103022](pictures/image-20230917003103022.png)
-
-![image-20230917003045607](pictures/image-20230917003045607.png)
 
 ```c++
 void init()
@@ -2585,3 +2561,54 @@ int get_ans(int x)
     return b[x]=(get_ans(x-p)+get_ans(x-p+1))%p;
 
 ```
+
+![image-20230917003103022](pictures/image-20230917003103022.png)
+
+![image-20230917003045607](pictures/image-20230917003045607.png)
+
+<img src="pictures/image-20231013212101976.png" alt="image-20231013212101976" style="zoom:67%;" />
+
+<img src="pictures/image-20231013212116950.png" alt="image-20231013212116950" style="zoom:80%;" />
+
+```cpp
+int fac[N], ifac[N];
+void minit(int x) {
+	fac[0] = 1;
+	L(i, 1, x) fac[i] = (ll) fac[i - 1] * i % mod;
+	ifac[x] = qpow(fac[x]);
+	R(i, x, 1) ifac[i - 1] = (ll) ifac[i] * i % mod;
+}
+int fpow(int x) {
+	return x % 2 == 0 ? 1 : mod - 1;
+}
+int n, m, x, f[N], g[N], s[N], ans;
+int main() {
+	n = read(), m = read(), x = read();
+	minit(m), init(m << 1);
+	L(i, 0, m) f[i] = (ll) ifac[i] * fpow(i) % mod;
+	L(i, 0, m) g[i] = (ll) ifac[i] * read() % mod;
+	Mul(f, g, s, m + 1, m + 1);
+	L(i, 0, m) s[i] = (ll) s[i] * fac[i] % mod;
+	int now = 1;
+	L(i, 0, m) (ans += (ll) now * s[i] % mod * ifac[i] % mod) %= mod, now = (ll) now * x % mod * (n - i) % mod;
+	cout << ans << endl;
+	return 0;
+}
+```
+
+### 莫比乌斯反演非卷积形式
+
+$$
+f(n) = \sum_{i=1}^nt(i)g(\lfloor \frac{n}{i}\rfloor) \\
+g(n)=\sum_{i=1}^n\mu(i)t(i)f(\lfloor \frac{n}{i}\rfloor)
+$$
+
+要求$t$是完全积性函数，$t(1) =1$
+
+### 常用泰勒展开
+
+<img src="pictures/image-20231020003849251.png" alt="image-20231020003849251" style="zoom:67%;" />
+
+<img src="pictures/image-20231020003900520.png" alt="image-20231020003900520" style="zoom:67%;" />
+
+<img src="pictures/image-20231020003816139.png" alt="image-20231020003816139" style="zoom:67%;" />
